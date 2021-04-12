@@ -50,6 +50,31 @@ void printWifiStatus() {
 }
 
 
+float battery_pct( float volt )
+{
+  // compute the battery percentage from a calibration curve i fitted,
+  // voltage below 3.7 is set to 0%, voltage above 4.3 is taken as 100 %
+  // calibration was a simple discharge profile of the voltage vs. time, 
+  // with constant load, so the time profile was mapped between 0 and 1 and
+  // fitted with a 7th degree polynomial
+  float c[8] = {
+      -1.27420465e+02,  2.54078156e+03, -1.81530908e+04,  3.88489493e+04,
+        1.72393171e+05, -1.19679634e+06,  2.63296360e+06, -2.09222570e+06 };
+
+  // handle edges
+  if ( volt < 3.7 ) return 0.;
+  if ( voilt > 4.3 ) return 1.;
+
+  float pct = c[0];
+  for ( uint8_t i = 1; i < 8; i++ )
+    pct = pct*x + c[i]
+
+  if ( pct < 0 ) pct = 0.;
+  if ( pct > 1. ) pct = 1.;
+
+  return pct;
+}
+
 void reconnect(){
    while (!mqtt.connected()) {
     Serial.print(F("Attempting MQTT connection..."));
@@ -252,6 +277,7 @@ void loop() {
     // battery voltage is internally wired to pin 35...
     // see : https://www.esp32.com/viewtopic.php?t=10147
     float battV = analogRead(35)/4096.0 * 7.445;
+    float battPct = battery_pct( battV );
 
     String payload = \
       "{\"wifiStatus\": " + String(WiFi.status()) +
@@ -260,6 +286,7 @@ void loop() {
       ", \"ssid\": \"" + WiFi.SSID() + "\"" +
       ", \"rssi\": " + String(WiFi.RSSI()) +
       ", \"battery_volt\": " + String(battV,2) +
+      ", \"battery_pct\": " + String(battPct,2) +
       ", \"mqttStatus\": " + mqtt.connected() + "}";
 
     Serial.print(F("STATUS: "));
