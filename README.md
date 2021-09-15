@@ -1,5 +1,7 @@
 # Waterrocket telemetry project
 
+Bino Maiheu
+
 ## Starting & stopping a run
 
 Publish a "1" to the the "run" topic on the mqtt broker to trigger the device to start publishing telemetry
