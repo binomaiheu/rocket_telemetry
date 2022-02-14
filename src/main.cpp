@@ -63,11 +63,11 @@ float battery_pct( float volt )
 
   // handle edges
   if ( volt < 3.7 ) return 0.;
-  if ( voilt > 4.3 ) return 1.;
+  if ( volt > 4.3 ) return 1.;
 
   float pct = c[0];
   for ( uint8_t i = 1; i < 8; i++ )
-    pct = pct*x + c[i]
+    pct = pct*volt + c[i]
 
   if ( pct < 0 ) pct = 0.;
   if ( pct > 1. ) pct = 1.;
